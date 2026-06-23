@@ -1,4 +1,4 @@
-# 복지/혜택 관리 플랫폼 백엔드
+## 임대차 계약 관리 플랫폼
 
 > 계약, 혜택, 사용자 관리를 위한 NestJS 기반 백엔드 서버입니다.
 
@@ -8,7 +8,7 @@
 
 | 분류 | 기술 |
 |------|------|
-| Framework | NestJS 11, TypeScript |
+| Framework | NestJS, TypeScript |
 | Database | Supabase |
 | Auth | Passport.js (Kakao / Google / Naver) |
 | Package Manager | yarn |
