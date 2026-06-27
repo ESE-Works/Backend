@@ -1,0 +1,11 @@
+name: Discord 알림
+
+on:
+  push:
+    branches:
+      - '**'  # 모든 브랜치
+
+jobs:
+  notify:
+    uses: YOUR_ORG_NAME/.github/.github/workflows/discord-notify-shared.yml@main
+    secrets: inherit  # Org Secrets 자동 상속
