@@ -1,5 +1,5 @@
 import { UsersService } from './../users/users.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
 
@@ -31,37 +31,49 @@ export class AuthService {
   }
 
   async kakaoLogin(accessToken: string) {
-    const { data } = await axios.get<{
-      id: number;
-      kakao_account?: {
-        profile?: { nickname?: string; profile_image_url?: string };
-      };
-    }>(KAKAO_USER_INFO_URL, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    try {
+      const { data } = await axios.get<{
+        id: number;
+        kakao_account?: {
+          profile?: { nickname?: string; profile_image_url?: string };
+        };
+      }>(KAKAO_USER_INFO_URL, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
 
-    return this.findOrCreateUser(
-      'kakao',
-      String(data.id),
-      data.kakao_account?.profile?.nickname ?? '사용자',
-      data.kakao_account?.profile?.profile_image_url,
-    );
+      return this.findOrCreateUser(
+        'kakao',
+        String(data.id),
+        data.kakao_account?.profile?.nickname ?? '사용자',
+        data.kakao_account?.profile?.profile_image_url,
+      );
+    } catch {
+      throw new ServiceUnavailableException(
+        '카카오 로그인 처리 중 오류가 발생했습니다.',
+      );
+    }
   }
 
   async googleLogin(accessToken: string) {
-    const { data } = await axios.get<{
-      sub: string;
-      name?: string;
-      picture?: string;
-    }>(GOOGLE_USER_INFO_URL, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    try {
+      const { data } = await axios.get<{
+        sub: string;
+        name?: string;
+        picture?: string;
+      }>(GOOGLE_USER_INFO_URL, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
 
-    return this.findOrCreateUser(
-      'google',
-      data.sub,
-      data.name ?? '사용자',
-      data.picture,
-    );
+      return this.findOrCreateUser(
+        'google',
+        data.sub,
+        data.name ?? '사용자',
+        data.picture,
+      );
+    } catch {
+      throw new ServiceUnavailableException(
+        '구글 로그인 처리 중 오류가 발생했습니다.',
+      );
+    }
   }
 }
