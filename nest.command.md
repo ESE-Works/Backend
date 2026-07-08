@@ -19,7 +19,7 @@ nest g --help
 - `nest g pipe (pi)` — 파이프 생성
 - `nest g provider (pr)` — 프로바이더 생성
 - `nest g resolver (r)` — GraphQL 리졸버 생성
-- `nest g resource (res)` — CRUD 리소스 한번에 생성 (module + controller + service)
+- `nest g resource (res)` — CRUD 리소스 한번에 생성 (module + controller + service) / ex) nest g resource src/modules/contracts --no-spec
 - `nest g service (s)` — 서비스 생성
 
 ## 자주 쓰는 옵션
