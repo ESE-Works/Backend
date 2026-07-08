@@ -1,0 +1,39 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Node.js 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 의존성 설치 및 빌드
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+
+      - name: GCP VM에 배포
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/Backend
+            git pull origin develop
+            yarn install --frozen-lockfile
+            yarn build
+            export $(cat .env | grep -v '^#' | xargs)
+            pm2 restart backend || pm2 start dist/main.js --name backend
+            pm2 save
