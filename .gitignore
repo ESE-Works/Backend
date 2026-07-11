@@ -41,6 +41,7 @@ lerna-debug.log*
 # 개발 진행 메모
 progress.md
 BACKEND.md
+/history
 .env.development.local
 .env.test.local
 .env.production.local
