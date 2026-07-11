@@ -26,6 +26,9 @@ export class User {
   region: string;
 
   @Column({ nullable: true })
+  age: number;
+
+  @Column({ nullable: true })
   income_range: string;
 
   @CreateDateColumn()
