@@ -25,6 +25,11 @@ import { NotificationsService } from './notifications.service';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
+  /**
+   * @param req 인증된 요청 (req.user.userId는 JwtStrategy가 주입)
+   * @param dto 등록할 fcm_token, device_type
+   * @returns 등록/갱신된 디바이스 토큰
+   */
   @Post('device-token')
   @ApiOperation({
     summary: 'FCM 디바이스 토큰 등록',
@@ -46,6 +51,9 @@ export class NotificationsController {
     );
   }
 
+  /**
+   * @param fcmToken 삭제할 디바이스 토큰 (path parameter)
+   */
   @Delete('device-token/:fcmToken')
   @ApiOperation({
     summary: 'FCM 디바이스 토큰 삭제',
@@ -62,6 +70,10 @@ export class NotificationsController {
     return this.notificationsService.removeDeviceToken(fcmToken);
   }
 
+  /**
+   * @param req 인증된 요청 (req.user.userId는 JwtStrategy가 주입)
+   * @returns 해당 유저의 알림 내역 (최신순)
+   */
   @Get()
   @ApiOperation({
     summary: '내 알림 목록 조회',
