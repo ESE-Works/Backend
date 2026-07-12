@@ -7,7 +7,7 @@ export const BENEFITS_SWAGGER: Record<
   findAll: {
     summary: '청년 지원 혜택 목록 조회',
     description: `
-외부 청년 지원 혜택 데이터를 조회합니다. 로그인 없이도 사용 가능합니다.
+외부 청년 지원 혜택 데이터를 조회합니다.
 region/age/incomeRange 쿼리 파라미터로 필터링할 수 있으며, 전달하지 않으면 전체 목록을 반환합니다.
 
 **테스트 방법**
