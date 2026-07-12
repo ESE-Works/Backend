@@ -7,6 +7,7 @@ import { AppService } from '../app.service';
 import { UsersModule } from './users/users.module';
 import { ContractsModule } from './contracts/contracts.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { BenefitsModule } from './benefits/benefits.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     UsersModule,
     ContractsModule,
     NotificationsModule,
+    BenefitsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
