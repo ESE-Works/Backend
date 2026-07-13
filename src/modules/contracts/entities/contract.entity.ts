@@ -22,6 +22,9 @@ export class Contract {
   @Column({ type: 'json', nullable: true })
   analysis_result!: object | null;
 
+  @Column({ type: 'varchar', nullable: true })
+  input_source!: string | null;
+
   @CreateDateColumn()
   created_at!: Date;
 }
