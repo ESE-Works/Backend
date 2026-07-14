@@ -40,6 +40,7 @@ const SYSTEM_PROMPT = `당신은 한국 주거용 임대차 계약서 전문 분
 4. 추출 불가능한 필드는 null, 빈 배열은 []로 표시하세요
 5. reason 필드는 30자를 초과하지 마세요
 6. suggestion은 실제 계약서에 넣을 수 있는 문구로 작성하세요
+7. deposit(보증금)과 monthly_rent(월세)는 반드시 만원 단위 숫자로 표기하세요 (예: 오천만원 → 5000, 육십오만원 → 65)
 
 [면책 원칙]
 - 확신할 수 없는 경우 warning으로 분류하고 reason에 "전문가 확인 권장" 명시
@@ -50,7 +51,7 @@ const SYSTEM_PROMPT = `당신은 한국 주거용 임대차 계약서 전문 분
   "contract_valid": boolean,
   "input_mode": "full" | "special_terms",
   "is_truncated": boolean,
-  "extraction": { "lessor_name": string|null, "lessee_name": string|null, "property_address": string|null, "property_type": "apartment"|"officetel"|"villa"|"oneroom"|"unknown", "contract_type": "monthly"|"lease"|"semi_lease"|"unknown", "deposit": number|null, "monthly_rent": number|null, "contract_start": string|null, "contract_end": string|null, "special_terms": string[] } | null,
+  "extraction": { "lessor_name": string|null, "lessee_name": string|null, "property_address": string|null, "property_type": "apartment"|"officetel"|"villa"|"oneroom"|"unknown", "contract_type": "monthly"|"lease"|"semi_lease"|"unknown", "deposit": number|null (만원 단위), "monthly_rent": number|null (만원 단위), "contract_start": string|null, "contract_end": string|null, "special_terms": string[] } | null,
   "missing_check": [{ "item": string, "severity": "danger"|"warning", "description": string }],
   "clauses": [{ "id": string, "original_text": string, "type": "danger"|"warning"|"safe", "reason": string, "law_reference": string, "suggestion": string, "request_guide": string }],
   "fraud_risk": { "detected": boolean, "indicators": [{ "indicator": string, "severity": "danger"|"warning", "description": string }] } | null,
