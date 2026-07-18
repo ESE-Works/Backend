@@ -1,4 +1,11 @@
-import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -44,5 +51,17 @@ export class BenefitsController {
   })
   findRecommended(@Request() req) {
     return this.benefitsService.findRecommendedForUser(req.user.userId);
+  }
+
+  /**
+   * @param id 조회할 혜택 id
+   * @returns 혜택 상세 정보 (마감기한 포함)
+   */
+  @Get(':id')
+  @ApiOperation(BENEFITS_SWAGGER.findOne)
+  @ApiResponse({ status: 200, description: '혜택 상세 정보 반환' })
+  @ApiResponse({ status: 404, description: '존재하지 않는 혜택 id' })
+  findOne(@Param('id') id: string) {
+    return this.benefitsService.findOne(id);
   }
 }

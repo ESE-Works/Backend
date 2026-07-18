@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { BenefitsCacheService } from './cache/benefits-cache.service';
 import { BenefitsProviderService } from './benefits-provider.service';
@@ -46,6 +46,23 @@ export class BenefitsService {
       age: user.age ?? undefined,
       incomeRange: user.income_range ?? undefined,
     });
+  }
+
+  /**
+   * @param id 조회할 혜택 id
+   * @returns 해당 혜택 상세 정보
+   * @throws NotFoundException 존재하지 않는 id일 때
+   */
+  async findOne(id: string): Promise<Benefit> {
+    const benefits = await this.benefitsCache.getOrFetch(() =>
+      this.benefitsProvider.fetchAll(),
+    );
+
+    const benefit = benefits.find((b) => b.id === id);
+    if (!benefit) {
+      throw new NotFoundException('해당 혜택을 찾을 수 없습니다.');
+    }
+    return benefit;
   }
 
   private matches(benefit: Benefit, filter: FilterBenefitsDto): boolean {

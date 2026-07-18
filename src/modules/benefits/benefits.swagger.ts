@@ -1,7 +1,7 @@
 import { ApiOperationOptions } from '@nestjs/swagger';
 
 export const BENEFITS_SWAGGER: Record<
-  'findAll' | 'findRecommended',
+  'findAll' | 'findRecommended' | 'findOne',
   ApiOperationOptions
 > = {
   findAll: {
@@ -26,6 +26,16 @@ region/age/incomeRange 쿼리 파라미터로 필터링할 수 있으며, 전달
 **테스트 방법**
 1. 상단 **Authorize** 버튼에 JWT 입력
 2. 별도 파라미터 없이 바로 Try it out으로 호출
+`,
+  },
+  findOne: {
+    summary: '혜택 상세 조회',
+    description: `
+특정 혜택의 상세 정보(마감기한 포함)를 조회합니다. 로그인 없이도 사용 가능합니다.
+
+**테스트 방법**
+1. 인증 없이 바로 Try it out으로 호출 가능
+2. path parameter에 조회할 혜택 id 입력 (예: mock-1)
 `,
   },
 };
