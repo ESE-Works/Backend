@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { ContractsModule } from './contracts/contracts.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { BenefitsModule } from './benefits/benefits.module';
+import { TermsModule } from './terms/terms.module';
 import { RequestLoggerMiddleware } from '../common/middleware/request-logger.middleware';
 
 @Module({
@@ -31,6 +32,7 @@ import { RequestLoggerMiddleware } from '../common/middleware/request-logger.mid
     ContractsModule,
     NotificationsModule,
     BenefitsModule,
+    TermsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
