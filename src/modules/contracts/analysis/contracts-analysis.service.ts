@@ -102,7 +102,43 @@ export class ContractsAnalysisService {
       isTruncated,
     );
 
-    const raw = await this.callWithRetry(userPrompt);
+    const raw = await this.callWithRetry([{ type: 'text', text: userPrompt }]);
+    return this.finalizeResult(raw, isSpecialTermsMode);
+  }
+
+  /**
+   * 계약서 사진(1장)을 GPT-4o Vision으로 분석한다. 별도 OCR 없이 이미지를 직접 읽어
+   * 텍스트 분석과 동일한 JSON 스키마로 결과를 반환한다. 이미지는 메모리에서만 다루며
+   * 디스크/DB에 저장하지 않는다.
+   *
+   * @param base64Image 이미지 base64 인코딩 문자열
+   * @param mimeType 이미지 mime 타입 (image/jpeg, image/png 등)
+   * @param inputSource 입력 방식 (image_camera | image_gallery | image_file)
+   */
+  async analyzeImage(
+    base64Image: string,
+    mimeType: string,
+    inputSource: InputSource,
+  ): Promise<ContractAnalysisResult> {
+    const userPrompt = `아래 이미지는 계약서 사진입니다. 이미지 속 글자를 읽어 분석하고 JSON 스키마에 맞게 결과를 반환하세요.
+
+[입력 방식: ${inputSource}]
+이미지가 흐리거나 일부만 보여 판독이 어려운 항목은 null로 표시하세요.`;
+
+    const raw = await this.callWithRetry([
+      { type: 'text', text: userPrompt },
+      {
+        type: 'image_url',
+        image_url: { url: `data:${mimeType};base64,${base64Image}` },
+      },
+    ]);
+    return this.finalizeResult(raw, false);
+  }
+
+  private finalizeResult(
+    raw: string,
+    isSpecialTermsMode: boolean,
+  ): ContractAnalysisResult {
     const result = this.parseResult(raw);
 
     if (!isSpecialTermsMode && result.contract_valid === false) {
@@ -137,9 +173,11 @@ ${contractText}
    * GPT 호출 후 JSON 파싱을 시도한다. 파싱 실패 시 한 번 재요청하고,
    * 그래도 실패하면 AiParseFailedException을 던진다.
    */
-  private async callWithRetry(userPrompt: string): Promise<string> {
+  private async callWithRetry(
+    userContent: OpenAI.Chat.ChatCompletionContentPart[],
+  ): Promise<string> {
     for (let attempt = 0; attempt < 2; attempt++) {
-      const content = await this.requestCompletion(userPrompt);
+      const content = await this.requestCompletion(userContent);
       try {
         JSON.parse(content);
         return content;
@@ -150,7 +188,9 @@ ${contractText}
     throw new AiParseFailedException();
   }
 
-  private async requestCompletion(userPrompt: string): Promise<string> {
+  private async requestCompletion(
+    userContent: OpenAI.Chat.ChatCompletionContentPart[],
+  ): Promise<string> {
     const completion = await this.client.chat.completions.create({
       model: MODEL,
       max_tokens: MAX_TOKENS,
@@ -158,7 +198,7 @@ ${contractText}
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt },
+        { role: 'user', content: userContent },
       ],
     });
 

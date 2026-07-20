@@ -54,6 +54,45 @@ export class ContractsService {
   }
 
   /**
+   * 계약서 사진을 분석하고 결과를 저장한다. 이미지 자체는 저장하지 않는다
+   * (분석 요청 중에만 메모리에 존재하고 응답 후 버려짐).
+   *
+   * @param userId 로그인한 유저 id
+   * @param imageBuffer 업로드된 이미지 파일 버퍼
+   * @param mimeType 이미지 mime 타입
+   * @param inputSource 입력 방식 (image_camera | image_gallery | image_file)
+   */
+  async analyzeImageAndSave(
+    userId: string,
+    imageBuffer: Buffer,
+    mimeType: string,
+    inputSource: InputSource,
+  ): Promise<Contract> {
+    const contract = this.contractsRepository.create({
+      user_id: userId,
+      original_text: null,
+      input_source: inputSource,
+      status: 'ANALYZING',
+    });
+    await this.contractsRepository.save(contract);
+
+    try {
+      const result = await this.analysisService.analyzeImage(
+        imageBuffer.toString('base64'),
+        mimeType,
+        inputSource,
+      );
+      contract.analysis_result = result;
+      contract.status = 'COMPLETED';
+      return this.contractsRepository.save(contract);
+    } catch (error) {
+      contract.status = 'FAILED';
+      await this.contractsRepository.save(contract);
+      throw error;
+    }
+  }
+
+  /**
    * @returns 캐싱된 샘플 분석 결과 (GPT 호출 없음)
    */
   getSampleAnalysis(): ContractAnalysisResult {

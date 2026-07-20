@@ -1,14 +1,20 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Param,
   Post,
+  Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiConsumes,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -18,6 +24,15 @@ import { AnalyzeTextDto } from './dto/analyze-text.dto';
 import { AnalyzeSpecialTermsDto } from './dto/analyze-special-terms.dto';
 import { ContractsService } from './contracts.service';
 import { CONTRACTS_SWAGGER } from './contracts.swagger';
+import { InputSource } from './analysis/analysis.types';
+
+const IMAGE_INPUT_SOURCES: InputSource[] = [
+  'image_camera',
+  'image_gallery',
+  'image_file',
+];
+const ALLOWED_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
 
 @ApiTags('Contracts')
 @Controller('contracts')
@@ -75,6 +90,59 @@ export class ContractsController {
       req.user.userId,
       dto.text,
       'text_special_terms',
+    );
+  }
+
+  /**
+   * @param req 인증된 요청 (req.user.userId는 JwtStrategy가 주입)
+   * @param file 업로드된 계약서 사진 (jpeg/png/webp, 최대 10MB)
+   * @param source 사진 획득 경로 (image_camera | image_gallery | image_file, 기본값 image_file)
+   * @returns 저장된 계약 레코드 (analysis_result 포함)
+   */
+  @Post('image')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation(CONTRACTS_SWAGGER.analyzeImage)
+  @ApiResponse({
+    status: 201,
+    description: '분석 결과가 저장된 계약 레코드 반환',
+  })
+  @ApiResponse({
+    status: 400,
+    description: '이미지 형식/크기 오류이거나 주거용 임대차 계약서가 아님',
+  })
+  @ApiResponse({
+    status: 503,
+    description: 'AI 응답 파싱 실패 (AI_PARSE_FAILED)',
+  })
+  analyzeImage(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+    @Query('source') source?: string,
+  ) {
+    if (!file) {
+      throw new BadRequestException('이미지 파일이 없습니다.');
+    }
+    if (!ALLOWED_IMAGE_MIME_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException(
+        'jpeg, png, webp 형식의 이미지만 업로드할 수 있습니다.',
+      );
+    }
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      throw new BadRequestException('이미지 크기는 10MB를 초과할 수 없습니다.');
+    }
+
+    const inputSource = IMAGE_INPUT_SOURCES.includes(source as InputSource)
+      ? (source as InputSource)
+      : 'image_file';
+
+    return this.contractsService.analyzeImageAndSave(
+      req.user.userId,
+      file.buffer,
+      file.mimetype,
+      inputSource,
     );
   }
 

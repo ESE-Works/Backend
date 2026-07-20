@@ -1,9 +1,29 @@
 import { ApiOperationOptions } from '@nestjs/swagger';
 
 export const CONTRACTS_SWAGGER: Record<
-  'analyzeText' | 'analyzeSpecialTerms' | 'sample' | 'findOne' | 'findAll',
+  | 'analyzeText'
+  | 'analyzeSpecialTerms'
+  | 'analyzeImage'
+  | 'sample'
+  | 'findOne'
+  | 'findAll',
   ApiOperationOptions
 > = {
+  analyzeImage: {
+    summary: '계약서 사진 분석',
+    description: `
+계약서 사진을 GPT-4o Vision으로 직접 읽어 분석합니다 (별도 OCR 없음).
+텍스트 분석과 동일한 결과(핵심 정보 추출, 필수 기재사항 누락, 위험 조항, 전세사기 위험 지표, 위험도 점수)를 반환합니다.
+이미지는 분석 중에만 메모리에 존재하며 저장하지 않습니다.
+
+**제약사항**: jpeg/png/webp, 최대 10MB
+
+**테스트 방법**
+1. 상단 **Authorize** 버튼에 JWT 입력
+2. body에 form-data로 file 필드에 이미지 첨부
+3. 필요 시 쿼리 파라미터 source에 image_camera | image_gallery | image_file 지정 (기본 image_file)
+`,
+  },
   analyzeText: {
     summary: '계약서 전체 텍스트 분석',
     description: `
