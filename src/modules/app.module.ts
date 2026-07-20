@@ -10,6 +10,7 @@ import { ContractsModule } from './contracts/contracts.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { BenefitsModule } from './benefits/benefits.module';
 import { TermsModule } from './terms/terms.module';
+import { MarketCheckModule } from './market-check/market-check.module';
 import { RequestLoggerMiddleware } from '../common/middleware/request-logger.middleware';
 
 @Module({
@@ -33,6 +34,7 @@ import { RequestLoggerMiddleware } from '../common/middleware/request-logger.mid
     NotificationsModule,
     BenefitsModule,
     TermsModule,
+    MarketCheckModule,
   ],
   controllers: [AppController],
   providers: [AppService],
