@@ -133,7 +133,9 @@ export class MolitApiService {
     // 전월세 API는 전세/월세 매물이 함께 내려오므로, 거래유형과 무관하게 항상 월세 필드를 읽어둔다
     // (0 또는 필드 없음 = 전세, 0보다 큼 = 월세로 판단해 이후 matchesTransactionType에서 걸러낸다).
     const monthlyRent =
-      transactionType === 'sale' ? null : this.parseAmount(item, MONTHLY_RENT_KEYS);
+      transactionType === 'sale'
+        ? null
+        : this.parseAmount(item, MONTHLY_RENT_KEYS);
 
     return { amount, monthlyRent };
   }

@@ -13,7 +13,7 @@ export const MARKET_CHECK_SWAGGER: Record<'diagnose', ApiOperationOptions> = {
 - 현재 서울/6대 광역시/세종만 지원합니다 (그 외 지역은 400 에러).
 
 **테스트 방법**
-1. 인증 없이 바로 Try it out으로 호출 가능
+1. 상단 **Authorize** 버튼에 JWT 입력
 2. body에 transactionType, propertyType, amount, sido, sigungu 입력 (월세는 monthlyRent도 입력)
 `,
   },
