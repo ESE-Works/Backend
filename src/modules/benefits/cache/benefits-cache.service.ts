@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
  * 혜택 데이터는 자주 바뀌지 않으므로, 매 요청마다 외부 API를 호출하지 않도록
  * TTL 동안은 이전 결과를 재사용한다.
  */
-const TTL_MS = 10 * 60 * 1000; // 10분
+const TTL_MS = 12 * 60 * 60 * 1000; // 12시간
 
 @Injectable()
 export class BenefitsCacheService {

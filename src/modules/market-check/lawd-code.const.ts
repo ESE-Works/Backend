@@ -106,3 +106,21 @@ export const LAWD_CODE_TABLE: Record<string, Record<string, string>> = {
 export function resolveLawdCode(sido: string, sigungu: string): string | null {
   return LAWD_CODE_TABLE[sido]?.[sigungu] ?? null;
 }
+
+let reverseTable: Map<string, string> | null = null;
+
+/**
+ * LAWD_CD(5자리) → "시/도 시/군/구" 문자열 역매핑.
+ * @returns 매핑되지 않은 코드면 null
+ */
+export function resolveRegionName(lawdCd: string): string | null {
+  if (!reverseTable) {
+    reverseTable = new Map();
+    for (const [sido, sigunguMap] of Object.entries(LAWD_CODE_TABLE)) {
+      for (const [sigungu, code] of Object.entries(sigunguMap)) {
+        reverseTable.set(code, `${sido} ${sigungu}`);
+      }
+    }
+  }
+  return reverseTable.get(lawdCd) ?? null;
+}
