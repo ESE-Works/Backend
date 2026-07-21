@@ -52,7 +52,7 @@ export class AuthController {
    * @param key 발급자가 공유한 테스트 로그인 비밀키
    * @returns 고정된 테스트 계정의 accessToken, refreshToken
    */
-  @Post('test-login')
+  @Post('admin-login')
   @HttpCode(200)
   @ApiOperation(AUTH_SWAGGER.testLogin)
   @ApiBody({
