@@ -127,7 +127,7 @@ export class AuthService {
    * @throws UnauthorizedException 비밀키가 설정값과 다르거나, 서버에 비밀키가 설정되지 않은 경우
    */
   async testLogin(secretKey: string) {
-    const expected = this.configService.get<string>('TEST_LOGIN_SECRET');
+    const expected = this.configService.get<string>('ADMIN_LOGIN_SECRET');
     if (!expected || secretKey !== expected) {
       throw new UnauthorizedException('비밀키가 올바르지 않습니다.');
     }
