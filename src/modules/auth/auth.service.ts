@@ -4,6 +4,7 @@ import {
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes, createHash } from 'crypto';
@@ -14,12 +15,14 @@ import { RefreshToken } from './entities/refresh-token.entity';
 const KAKAO_USER_INFO_URL = 'https://kapi.kakao.com/v2/user/me';
 const GOOGLE_USER_INFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo';
 const REFRESH_TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30일
+const TEST_LOGIN_PROVIDER_ID = 'judge-test-account';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
   ) {}
@@ -114,6 +117,27 @@ export class AuthService {
       accessToken: this.jwtService.sign({ sub: existing.user_id }),
       refreshToken: await this.issueRefreshToken(existing.user_id),
     };
+  }
+
+  /**
+   * 심사위원 등 외부 테스트용 로그인. 소셜 로그인 없이 공유된 비밀키만 맞으면
+   * 고정된 테스트 계정으로 로그인 처리한다 (최초 호출 시 계정 자동 생성).
+   *
+   * @param secretKey 발급자가 심사위원에게 공유한 비밀키
+   * @throws UnauthorizedException 비밀키가 설정값과 다르거나, 서버에 비밀키가 설정되지 않은 경우
+   */
+  async testLogin(secretKey: string) {
+    const expected = this.configService.get<string>('TEST_LOGIN_SECRET');
+    if (!expected || secretKey !== expected) {
+      throw new UnauthorizedException('비밀키가 올바르지 않습니다.');
+    }
+
+    return this.findOrCreateUser(
+      'test',
+      TEST_LOGIN_PROVIDER_ID,
+      '심사위원 테스트 계정',
+      undefined,
+    );
   }
 
   /**

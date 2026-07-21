@@ -49,6 +49,26 @@ export class AuthController {
   }
 
   /**
+   * @param key 발급자가 공유한 테스트 로그인 비밀키
+   * @returns 고정된 테스트 계정의 accessToken, refreshToken
+   */
+  @Post('test-login')
+  @HttpCode(200)
+  @ApiOperation(AUTH_SWAGGER.testLogin)
+  @ApiBody({
+    schema: {
+      properties: {
+        key: { type: 'string', description: '공유받은 테스트 로그인 비밀키' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: '로그인 성공, JWT 반환' })
+  @ApiResponse({ status: 401, description: '비밀키가 올바르지 않음' })
+  testLogin(@Body('key') key: string) {
+    return this.authService.testLogin(key);
+  }
+
+  /**
    * @param refreshToken 로그인 시 발급받은 refresh token 원본 값
    * @returns 새로 발급된 accessToken, refreshToken
    */

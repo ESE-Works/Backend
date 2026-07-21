@@ -1,9 +1,21 @@
 import { ApiOperationOptions } from '@nestjs/swagger';
 
 export const AUTH_SWAGGER: Record<
-  'kakaoLogin' | 'googleLogin' | 'refresh',
+  'kakaoLogin' | 'googleLogin' | 'refresh' | 'testLogin',
   ApiOperationOptions
 > = {
+  testLogin: {
+    summary: '테스트 로그인 (심사위원용)',
+    description: `
+소셜 로그인 없이, 공유받은 비밀키만으로 고정된 테스트 계정에 로그인합니다.
+최초 호출 시 테스트 계정이 자동으로 생성되고, 이후에는 같은 계정으로 로그인됩니다.
+
+**테스트 방법**
+1. body에 공유받은 key 값 입력 후 호출
+2. 응답으로 받은 accessToken(JWT)을 Swagger 상단 **Authorize** 버튼에 입력
+3. 이후 모든 보호된 API 테스트 가능
+`,
+  },
   kakaoLogin: {
     summary: '카카오 소셜 로그인',
     description: `
