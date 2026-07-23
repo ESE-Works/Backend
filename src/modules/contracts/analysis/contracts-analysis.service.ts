@@ -120,7 +120,14 @@ export class ContractsAnalysisService {
     mimeType: string,
     inputSource: InputSource,
   ): Promise<ContractAnalysisResult> {
-    const userPrompt = `아래 이미지는 계약서 사진입니다. 이미지 속 글자를 읽어 분석하고 JSON 스키마에 맞게 결과를 반환하세요.
+    const userPrompt = `아래 이미지는 계약서 사진입니다. 다음 순서로 작업하세요.
+
+1. 이미지 속 글자를 빠짐없이 읽어 계약서 전체 원문을 파악하세요 (OCR).
+2. 1에서 읽은 원문 전체를 대상으로, 텍스트로 입력받았을 때와 동일한 수준으로 철저히 분석하세요.
+   추출된 특약사항(special_terms)에 포함된 조항도 반드시 clauses 배열에서 개별 위험도를 평가하고,
+   필수 기재사항 누락(missing_check)과 전세사기 위험 지표(fraud_risk)도 빠짐없이 확인하세요.
+   "이미지라서 텍스트를 읽는 것까지만 한다"는 식으로 분석을 생략하지 마세요.
+3. JSON 스키마에 맞게 결과를 반환하세요.
 
 [입력 방식: ${inputSource}]
 이미지가 흐리거나 일부만 보여 판독이 어려운 항목은 null로 표시하세요.`;
